@@ -3,30 +3,15 @@ import { Text, View } from 'react-native';
 import { FluidNavigator, Transition } from 'react-navigation-fluid-transitions';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import SignIn from './signin';
+import SignInContainer from './container';
 import Register from './register';
+
 
 const StartUpNavigator = FluidNavigator(
 	{
-		SignIn: { screen: SignIn },
+		SignIn: { screen: SignInContainer },
 		Register: { screen: Register }
 	});
 
-class StartUpManager extends Component {
 
-	constructor(props) {
-		super(props);
-		this.state = {};
-	}
-
-	render() {
-
-		return (
-			<StartUpNavigator
-				screenProps={this.props.screenProps}
-			/>
-		);
-	}
-}
-
-export default StartUpManager
+export default StartUpNavigator

@@ -1,34 +1,43 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   Platform,
   StyleSheet,
   Text,
   View,
   Button
-} from 'react-native';
+} from 'react-native'
+import { Provider } from 'react-redux'
+import { createSwitchNavigator } from 'react-navigation'
 
-import { createSwitchNavigator } from 'react-navigation';
+import configureStore from './store'
 
-import TabNavigation from './components/TabNavigation';
-import StartUpManager from './views/StartUp/manager';
-import StartUpLoader from './views/StartUp/loader';
+import TabNavigator from './navigators/TabNavigator'
+import StartUpNavigator from './views/StartUp/Navigator'
+import StartUpLoader from './views/StartUp/loader'
+import AuthContainer from './containers/Auth'
 
+const store = configureStore()
 
 const SwitchNav = createSwitchNavigator(
   {
-    App: TabNavigation,
-    Auth: StartUpManager,
+    App: TabNavigator,
+    Auth: AuthContainer,
     AuthLoader: StartUpLoader
   }, 
   {
     initialRouteName: 'Auth'
   }
-);
+)
 
 export default class App extends Component {
   
   render() {
-    return <SwitchNav />;
+    console.log(store.getState())
+    return (
+      <Provider store={store}>
+        <SwitchNav />
+      </Provider>
+    )
   }
 }
 
@@ -51,7 +60,7 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-});
+})
 
 
 

@@ -11,7 +11,10 @@ class SignIn extends React.Component {
 
   constructor (props) {
     super(props);
-
+    console.log('signin')
+    
+    console.log(props)
+    
     this.state = {
       email: '',
       emailValid: true,
@@ -21,6 +24,9 @@ class SignIn extends React.Component {
       loginFailed: false,
       isLoading: false      
     }
+  }
+
+  componentDidMount() {
   }
 
   render () {
@@ -114,12 +120,11 @@ class SignIn extends React.Component {
   submitLogin = () => {
 
     this.setState({
-      isLoading: true
+      isLoading: false
     });
 
 
-    console.log('boraaa')
-
+    console.log(this.props.navigation)
     this.props.navigation.navigate('App');
     
 
