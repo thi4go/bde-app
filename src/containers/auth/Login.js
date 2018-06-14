@@ -1,36 +1,38 @@
 import React from 'react';
-import { View, AsyncStorage, Image, ImageBackground } from 'react-native';
-import Styles from './styles';
-import { LogoContainer, Logo } from './shared';
+import { View, Image, StyleSheet, ToastAndroid } from 'react-native';
 import {Transition} from 'react-navigation-fluid-transitions';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { connect } from 'react-redux'
 import { Text, Input, Button } from 'react-native-elements';
+import NavigationService from '../../lib/NavigationService'
+import { login } from '../../store/modules/auth'
 
 
-class Register extends React.Component {
+class Login extends React.Component {
 
   constructor (props) {
     super(props);
-
+    
     this.state = {
       email: '',
       emailValid: true,
       password: '',
       confirmPassword: '',
       passwordValid: true,
-      loginFailed: false,
-      isLoading: false      
+      loginFailed: false
     }
+
+    console.log('login')
   }
+
 
   render () {
     return (
-      
       <View style={Styles.container} >
 
         <View style={Styles.logoContainer}>
           <Transition shared="logo">
-            <Image source={require('../../images/004.png')} style={{width: 200, height: 200 }} />    
+            <Image source={require('../../assets/img/004.png')} style={{width: 240, height: 240 }} />    
           </Transition>
         </View>
 
@@ -46,13 +48,14 @@ class Register extends React.Component {
             placeholder='Email' 
             onChangeText={email => this.setState({email})}
             value={this.state.mail} 
-            inputStyle={{color: 'black'}}
+            inputStyle={{marginLeft: 10, color: 'black'}}
             autoCapitalize='none'
-            style={Styles.textInput} 
+            style={Styles.textInput}
+            keyboardType='email-address'
             errorStyle={{textAlign: 'center', fontSize: 12}}
             errorMessage={this.state.emailValid ? null : "Entre com um email válido "}
             blurOnSubmit={true}
-          />
+            />
 
           <Input 
             leftIcon={
@@ -62,6 +65,8 @@ class Register extends React.Component {
                 size={23}
               />
             }
+            secureTextEntry={true}
+            type='password'
             placeholder='Senha' 
             value={this.state.password} 
             keyboardAppearance='light'
@@ -72,41 +77,26 @@ class Register extends React.Component {
             blurOnSubmit={true}
           />
             
-          <Input 
-            leftIcon={
-              <Icon
-                name='lock'
-                color='black'
-                size={23}
-              />
-            }
-            placeholder='Confirme sua senha' 
-            value={this.state.confirmPassword} 
-            keyboardAppearance='light'
-            onChangeText={password => this.setState({confirmPassword})}
-            inputStyle={{marginLeft: 10, color: 'black'}}
-            containerStyle={{marginVertical: 10}}
-            style={Styles.textInput}
-            blurOnSubmit={true}
-          />  
 
           <Button
-            title='Cadastrar'
+            title='LOG IN'
             activeOpacity={1}
-            underlayColor="transparent"
-            loading={this.state.isLoading}
+            underlayColor="white"
+            loading={this.props.isLoading}
             keyboardAppearance='light'
             loadingProps={{size: 'small', color: 'white'}}
             buttonStyle={{alignSelf: 'stretch', marginTop: 20, height: 50, width: 330, backgroundColor: 'black', borderWidth: 1, borderColor: 'white', borderRadius: 5}}
-            // disabled={ this.state.password.length < 8 }
             containerStyle={{marginVertical: 10}}
             titleStyle={{fontWeight: 'bold', color: 'white'}}
 
+            onPress={this.submitLogin.bind(this)}
           />
 
+          <Text>Esqueceu sua senha? Clique aqui</Text>
           
+
           <Button
-            title='Voltar para o Login'
+            title='Cadastre-se'
             containerStyle={{marginTop: 20, fontWeight: 'bold'}}
             titleStyle={{ fontWeight: "600", color: "black" }}
             buttonStyle={{
@@ -119,21 +109,88 @@ class Register extends React.Component {
             }}
             containerStyle={{ marginTop: 20 }}          
             
-            onPress={ () => this.props.navigation.goBack()}
-          />          
+            onPress={ () => this.props.navigation.navigate('Register')}
+          />
         </View>  
-
-      </View>      
+      </View>
+      
     );
-  }
-
-  
-  _signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('App');
   };
+
+  submitLogin = async () => {
+
+    const payload = {
+      email: this.state.email,
+      password: this.state.password
+    }
+
+    try {
+      const resp = await this.props.dispatch(login(payload))
+    } catch (err) {
+    }
+
+    if(this.props.errorMsg) {
+      ToastAndroid.show(this.props.errorMsg, ToastAndroid.LONG)
+    } else {
+      NavigationService.switchNavigate('App')
+    }
+
+    
+  };
+
 
 }
 
 
-export default Register;
+const Styles = StyleSheet.create({
+
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignSelf: 'stretch',
+    width: null,
+    padding: 20
+  },
+
+  logoContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+
+  logo: {
+    width: 240,
+    height: 240
+  },
+
+  logoText: {
+    // fontWeight: 300
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+    
+  },
+
+  loginFormContainer: {
+    flex: 1,
+    marginTop: 35,
+    alignItems: 'center',
+  },
+
+  textInput: {
+    color: 'black',
+    height: 40,
+    marginBottom: 20,
+    paddingBottom: 20,
+    borderColor: 'grey',
+    borderWidth: 0.4,
+    alignSelf: 'stretch'
+  }
+})
+
+function mapStateToProps (state) {
+  const { isLoading, errorMsg } = state.auth
+
+  return { isLoading, errorMsg }
+}
+
+export default connect(mapStateToProps)(Login)

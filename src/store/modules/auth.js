@@ -1,20 +1,19 @@
-import axios from 'axios'
+import StorageService from '../../lib/StorageService'
 
 // ACTIONS
-const SET_VALID     = 'bde/auth/SET_VALID'
-const SET_ISLOADING = 'bde/auth/SET_ISLOADING'
 const LOGOUT        = 'bde/auth/LOGOUT'
 // ASYNC ACTIONS
 const LOGIN_REQUEST = 'bde/auth/LOGIN_REQUEST'
 const LOGIN_SUCCESS = 'bde/auth/LOGIN_SUCCESS'
 const LOGIN_FAILURE = 'bde/auth/LOGIN_FAILURE'
-
+const SANITIZE_STATE = 'bde/auth/SANITIZE_STATE'
 
 
 const initialState = {
   valid: false,
-  user: {init: 'as'},
+  user: {},
   token: null,
+
   isLoading: false
 }
 
@@ -22,8 +21,6 @@ const initialState = {
 export default function reducer (state = initialState, action = {}) {
 
   switch (action.type) {
-    case SET_VALID:
-      return { ...state, valid: !state.valid}
 
     case LOGIN_REQUEST:
       return { ...state,
@@ -31,11 +28,28 @@ export default function reducer (state = initialState, action = {}) {
       }
 
     case LOGIN_SUCCESS:
-      return { ...state,
+
+      return {
+        ...state,
         user: action.user,
         token: action.token,
+        valid: true,
         isLoading: false
       }
+
+    case LOGIN_FAILURE:
+      return { 
+        ...state,
+        errorMsg: action.errorMsg, 
+        isLoading: false
+      } 
+
+    case SANITIZE_STATE:
+      delete state.navigators
+
+      return { 
+        ...state
+      } 
 
     case LOGOUT:
       return initialState
@@ -54,19 +68,24 @@ export function isAuthValid (state) {
 }
 
 
-export function setValid () {
-  return { type: SET_VALID }
-}
-
-export function requestLogin () {
+export function loginRequest () {
   return { type: LOGIN_REQUEST,  }
 }
 
-export function loginSuccess (user, token) {
+export function loginSuccess (data) {
   return { 
     type: LOGIN_SUCCESS,
-    user: user,
-    token: token
+    user: data.user,
+    token: data.token
+  }
+}
+
+export function loginFailure (data) {
+  return { 
+    type: LOGIN_FAILURE,
+    errorMsg: data.response.status == 401 ? 
+    'Usuário não encontrado. Por favor, insira credenciais válidas' :
+    'Error no servidor. Por favor, contacte o suporte'
   }
 }
 
@@ -76,21 +95,39 @@ export function logout () {
   }
 }
 
+export function sanitizeState () {
+  return {
+    type: SANITIZE_STATE
+  }
+}
+
 // THUNK CREATOR
 
-// export function login (credentials) {
+export function saveSession (data) {
 
-//   return function (dispatch) {
+  return function (dispatch, getState, api) {
 
-//     dispatch(requestLogin())
-    
-//     return axios.get('http://localhost:8000/users')
-//       .then ( response => response.json(),
-//               error    => console.log('err')
-//       .then( json => dispatch(loginSuccess(json)))
-//     )
-//   }
-// }
+    return StorageService.set('session', data.data)
+           .then (
+             data  => dispatch(loginSuccess(data)),
+             error => dispatch(loginFailure(error))
+           )
+  }
+}
+
+export function login (credentials) {
+
+  return function (dispatch, getState, api) {
+
+    dispatch(loginRequest())
+
+    return api.postLogin(credentials)
+          .then ( 
+            data   => dispatch(saveSession(data)),
+            error  => dispatch(loginFailure(error))
+          )
+  }
+}
 
 
 

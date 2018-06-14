@@ -1,22 +1,27 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux'
-import thunkMiddleware from 'redux-thunk'
+import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-// ​
+
+import api from '../lib/api'
 import auth from './modules/auth'
+import battles from './modules/battles'
 
 const rootReducer = combineReducers({
-  auth
+  auth,
+  battles
 })
 
+
 const loggerMiddleware = createLogger()
-// ​
+
+
 export default function configureStore (preloadedState) {
 
   return createStore(
     rootReducer,
     preloadedState,
     applyMiddleware(
-      thunkMiddleware,
+      thunk.withExtraArgument(api),
       loggerMiddleware
     )
   )
