@@ -1,11 +1,11 @@
 import StorageService from '../../lib/StorageService'
 
 // ACTIONS
-const LOGOUT        = 'bde/auth/LOGOUT'
+const LOGOUT         = 'bde/auth/onLogout'
 // ASYNC ACTIONS
-const LOGIN_REQUEST = 'bde/auth/LOGIN_REQUEST'
-const LOGIN_SUCCESS = 'bde/auth/LOGIN_SUCCESS'
-const LOGIN_FAILURE = 'bde/auth/LOGIN_FAILURE'
+const LOGIN_REQUEST  = 'bde/auth/LOGIN_REQUEST'
+const LOGIN_SUCCESS  = 'bde/auth/LOGIN_SUCCESS'
+const LOGIN_FAILURE  = 'bde/auth/LOGIN_FAILURE'
 const SANITIZE_STATE = 'bde/auth/SANITIZE_STATE'
 
 
@@ -16,7 +16,6 @@ const initialState = {
 
   isLoading: false
 }
-
 
 export default function reducer (state = initialState, action = {}) {
 
@@ -68,11 +67,12 @@ export function isAuthValid (state) {
 }
 
 
-export function loginRequest () {
+export function onLoginRequest () {
   return { type: LOGIN_REQUEST,  }
 }
 
-export function loginSuccess (data) {
+export function onLoginSuccess (data) {
+  console.log("onLoginSuccess")
   return { 
     type: LOGIN_SUCCESS,
     user: data.user,
@@ -80,7 +80,7 @@ export function loginSuccess (data) {
   }
 }
 
-export function loginFailure (data) {
+export function onLoginFailure (data) {
   return { 
     type: LOGIN_FAILURE,
     errorMsg: data.response.status == 401 ? 
@@ -89,9 +89,9 @@ export function loginFailure (data) {
   }
 }
 
-export function logout () {
+export function onLogout () {
   return {
-    type: LOGOUT
+    type: onLogout
   }
 }
 
@@ -101,30 +101,26 @@ export function sanitizeState () {
   }
 }
 
-// THUNK CREATOR
+// THUNK CREATORS
 
 export function saveSession (data) {
 
-  return function (dispatch, getState, api) {
+  return () => {
 
-    return StorageService.set('session', data.data)
-           .then (
-             data  => dispatch(loginSuccess(data)),
-             error => dispatch(loginFailure(error))
-           )
+    return StorageService.set('session', data)
   }
 }
 
-export function login (credentials) {
+export function _onLogin (credentials) {
 
-  return function (dispatch, getState, api) {
+  return (dispatch, api) => {
 
-    dispatch(loginRequest())
+    dispatch(onLoginRequest())
 
     return api.postLogin(credentials)
-          .then ( 
-            data   => dispatch(saveSession(data)),
-            error  => dispatch(loginFailure(error))
+          .then( 
+            data   => dispatch(onLoginSuccess(data.data)),
+            error  => dispatch(onLoginFailure(error))
           )
   }
 }

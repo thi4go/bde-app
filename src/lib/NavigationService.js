@@ -2,13 +2,27 @@ import { NavigationActions } from 'react-navigation'
 
 
 
-let _switchNav;
+let _switchNav
+let _battleNav
 
-function setSwitchNav(navigatorRef) {
+function setSwitchNav (navigatorRef) {
   _switchNav = navigatorRef
 }
 
-function switchNavigate(routeName, params = {}) {
+function setBattleNav (navigatorRef) {
+  _battleNav = navigatorRef
+}
+
+function battleNavigate (routeName, params = {}) {
+  _battleNav.dispatch(
+    NavigationActions.navigate({
+      routeName,
+      params
+    })
+  )
+}
+
+function switchNavigate (routeName, params = {}) {
   _switchNav.dispatch(
     NavigationActions.navigate({
       routeName,
@@ -20,5 +34,7 @@ function switchNavigate(routeName, params = {}) {
 
 export default {
   setSwitchNav,
-  switchNavigate
+  setBattleNav,
+  switchNavigate,
+  battleNavigate
 }

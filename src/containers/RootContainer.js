@@ -1,13 +1,9 @@
 import React, { Component } from 'react'
-
 import { createSwitchNavigator } from 'react-navigation'
-
 import AppContainer from './AppContainer'
-import AuthContainer from './AuthContainer'
+import AuthContainer from './auth/AuthContainer'
 import AuthLoader from './auth/Loader'
-
 import NavigationService from '../lib/NavigationService'
-
 
 
 const SwitchNav = createSwitchNavigator(
@@ -17,10 +13,9 @@ const SwitchNav = createSwitchNavigator(
     AuthLoader: AuthLoader
   }, 
   {
-    initialRouteName: 'AuthLoader'
+    initialRouteName: 'Auth'
   }
 )
-
 
 class RootContainer extends Component {
 
@@ -31,9 +26,6 @@ class RootContainer extends Component {
       />
     )  
   }
-
 }
-
-
 
 export default RootContainer

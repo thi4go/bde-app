@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Text, Input, Button } from 'react-native-elements';
 import NavigationService from '../../lib/NavigationService'
 import { login } from '../../store/modules/auth'
+import StorageService from '../../lib/StorageService';
 
 
 class Login extends React.Component {
@@ -23,6 +24,7 @@ class Login extends React.Component {
     }
 
     console.log('login')
+    console.log(this.props)
   }
 
 
@@ -125,16 +127,19 @@ class Login extends React.Component {
     }
 
     try {
-      const resp = await this.props.dispatch(login(payload))
+      var resp = await this.props.dispatch(login(payload))
     } catch (err) {
+      console.log(err)
     }
-
+    
     if(this.props.errorMsg) {
       ToastAndroid.show(this.props.errorMsg, ToastAndroid.LONG)
     } else {
+
+      console.log(resp)
+
       NavigationService.switchNavigate('App')
     }
-
     
   };
 

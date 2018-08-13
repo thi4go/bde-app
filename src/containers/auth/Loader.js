@@ -1,25 +1,19 @@
 import React, { Component } from 'react'
-import { Text, View, AsyncStorage } from 'react-native'
+import { Text, View } from 'react-native'
 import StorageService from '../../lib/StorageService'
 
-
 class AuthLoader extends Component {
-
-  constructor (props) {
-    super (props)
-
-    
-  }
 
   async componentDidMount () {
     console.log('aqui') 
 
-    await AsyncStorage.setItem('lol', 'lol')
+    let session = await StorageService.get('session')
 
-    let result = await AsyncStorage.getItem('lol')
-
-    console.log(result)
-    
+    if (session == null) {
+      this.props.navigation.navigate('Auth')
+    } else {
+      this.props.navigation.navigate('App')
+    }
   }
 
   render() {
@@ -30,7 +24,6 @@ class AuthLoader extends Component {
     )
   }
 }
-
 
 
 export default AuthLoader

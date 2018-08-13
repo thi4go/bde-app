@@ -6,7 +6,6 @@ const BATTLES_SUCCESS = 'bde/battles/BATTLES_SUCCESS'
 const BATTLES_FAILURE = 'bde/battles/BATTLES_FAILURE'
 
 
-
 export default function reducer (state = {}, action = {}) {
 
   switch (action.type) {
@@ -26,7 +25,8 @@ export default function reducer (state = {}, action = {}) {
       return { 
         ...state,
         isLoading: false,
-        data: action.battles
+        data: action.battles,
+        hashedData: action.hashedBattles
       }
     
 
@@ -44,13 +44,6 @@ export default function reducer (state = {}, action = {}) {
 }
 
 
-function battlesToHash (battles) {
-  let hash = {}
-  for (battle of battles) {
-    hash[battle._id] = battle
-  }
-  return hash
-}
 // ACTION CREATORS
 
 export function battlesRequest () {
@@ -58,11 +51,11 @@ export function battlesRequest () {
 }
 
 export function battlesSuccess (data) {
-  console.log("BORA")
-  console.log(battlesToHash(data.data))
   return { 
     type: BATTLES_SUCCESS,
-    battles: battlesToHash(data.data)
+    battles: data,
+    hashedBattles: battlesToHash(data)
+    
   }
 }
 
@@ -73,19 +66,27 @@ export function battlesFailure (data) {
   }
 }
 
-
-export function battles () {
-
+export function _battles () {
   return function (dispatch, getState, api) {
-
     dispatch(battlesRequest())
-
     return api.getBattles()
           .then ( 
-            data   => dispatch(battlesSuccess(data)),
+            data   => dispatch(battlesSuccess(data.data)),
             error  => dispatch(battlesFailure(error))
           )
   }
 }
+
+// AUX FUNCTIONS
+
+function battlesToHash (battles) {
+  let hash = {}
+  for (battle of battles) {
+    hash[battle._id] = battle
+  }
+  return hash
+}
+
+
 
 
