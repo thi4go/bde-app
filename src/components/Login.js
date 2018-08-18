@@ -8,9 +8,8 @@ import { Field, reduxForm } from 'redux-form';
 const Login = ({ 
   isLoading, 
   errorMsg, 
-  login, 
   handleSubmit, 
-  navigation 
+  nav 
 }) => {
   return (
     <View style={Styles.container} >
@@ -73,7 +72,7 @@ const Login = ({
             
 
           <Button
-            title='LOG IN'
+            title='LOGIN'
             activeOpacity={1}
             underlayColor="white"
             loading={isLoading}
@@ -102,7 +101,7 @@ const Login = ({
             }}
             containerStyle={{ marginTop: 20 }}          
             
-            onPress={ () => navigation.navigate('Register')}
+            onPress={ () => nav.navigate('Register')}
           />
         </View>  
       </View>

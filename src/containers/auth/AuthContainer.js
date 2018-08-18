@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
-import { FluidNavigator } from 'react-navigation-fluid-transitions'
-import Login from '../../components/Login'
-import Register from './Register'
-import { _onLogin } from '../../store/modules/auth'
-import { connect } from 'react-redux'
-
+import React, { Component } from 'react';
+import { FluidNavigator } from 'react-navigation-fluid-transitions';
+import { ToastAndroid } from 'react-native';
+import Login from '../../components/Login';
+import Register from '../../components/Register';
+import { _onLogin } from '../../store/modules/auth';
+import { connect } from 'react-redux';
 
 const mapStateToProps = (state) => {
 	const { isLoading, errorMsg } = state.auth
@@ -14,35 +14,40 @@ const mapStateToProps = (state) => {
 
 class LoginContainer extends Component {
 
-	handleSubmit = (values) => {
-		console.log(values)
-		// const payload = {
-    //   email: this.state.email,
-    //   password: this.state.password
-    // }
-
-    // try {
-    //   var resp = await this.props.dispatch(login(payload))
-    // } catch (err) {
-    //   console.log(err)
-    // }
+	handleSubmit = async (values) => {
+		const payload = {
+      email: values.email,
+      password: values.password
+    }
+		console.log(this.props)
+    try {
+      var resp = await this.props.dispatch(_onLogin(payload));
+    } catch (err) {
+			console.log('errr')
+      console.log(err)
+    }
     
-    // if(this.props.errorMsg) {
-    //   ToastAndroid.show(this.props.errorMsg, ToastAndroid.LONG)
-    // } else {
+    if(this.props.errorMsg) {
+      ToastAndroid.show(this.props.errorMsg, ToastAndroid.LONG)
+    } else {
+			console.log('resp')
+    console.log(resp)
 
-    //   console.log(resp)
-
-    //   NavigationService.switchNavigate('App')
-    // }
+      // NavigationService.switchNavigate('App')
+    }
 	}
 
 	render () {
-		return <Login onSubmit={this.handleSubmit} />
+		return <Login 
+			onSubmit={this.handleSubmit} 
+			nav={this.props.navigation}
+			isLoading={this.props.isLoading}
+		/>
 	}
 }
 
 LoginContainer = connect(mapStateToProps)(LoginContainer);
+
 
 class RegisterContainer extends Component {
 
@@ -51,13 +56,18 @@ class RegisterContainer extends Component {
 	}
 
 	render () {
-
+		return <Register onSubmit={this.handleSubmit} nav={this.props.navigation} />
 	}
 } 
 
-const AuthContainer = FluidNavigator({
+RegisterContainer = connect(mapStateToProps)(RegisterContainer); 
+
+
+const AuthContainer = 
+	FluidNavigator({
 		Login: { screen: LoginContainer },
-		Register: { screen: Register }
+		Register: { screen: RegisterContainer }
 	});
 	
-export default AuthContainer
+
+export default AuthContainer;

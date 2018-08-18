@@ -107,21 +107,21 @@ export function saveSession (data) {
 
   return () => {
 
-    return StorageService.set('session', data)
+    return StorageService.set('session', data);
   }
 }
 
 export function _onLogin (credentials) {
 
   return (dispatch, api) => {
-
+    console.log(api)
     dispatch(onLoginRequest())
 
     return api.postLogin(credentials)
           .then( 
             data   => dispatch(onLoginSuccess(data.data)),
             error  => dispatch(onLoginFailure(error))
-          )
+          );
   }
 }
 

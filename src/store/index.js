@@ -10,10 +10,10 @@ const rootReducer = combineReducers({
   auth,
   battles,
   form: formReducer
-})
+});
 
 
-const loggerMiddleware = createLogger()
+const loggerMiddleware = createLogger();
 
 
 export default function configureStore (preloadedState) {
